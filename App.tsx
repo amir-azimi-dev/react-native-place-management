@@ -1,20 +1,55 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { RootStackNavigationProps } from './types/navigation';
+import AllPlaces from './screens/AllPlaces';
+import AddPlace from './screens/AddPlace';
+import PlaceDetails from './screens/PlaceDetails';
+import { createStaticNavigation } from '@react-navigation/native';
+import IconButton from './components/IconButton';
+
+const StackNavigator = createNativeStackNavigator<RootStackNavigationProps>({
+  initialRouteName: "AllPlaces",
+
+  screens: {
+    AllPlaces: {
+      screen: AllPlaces,
+      options: ({ navigation }) => ({
+        title: "All Places",
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon="add"
+            color={tintColor}
+            size={30}
+            onPress={() => navigation.navigate("AddPlace")}
+          />
+        )
+      })
+    },
+
+    AddPlace: {
+      screen: AddPlace,
+      options: {
+        title: "Add Place",
+        presentation: "modal"
+      }
+    },
+
+    PlaceDetails: {
+      screen: PlaceDetails,
+      options: {
+        title: "Place Details"
+      }
+    },
+  }
+});
+
+const Navigation = createStaticNavigation(StackNavigator);
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <StatusBar style="dark" />
+      <Navigation />
+    </>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+};
