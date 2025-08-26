@@ -24,6 +24,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you pick them.",
+          "cameraPermission": "The app accesses your camera to let you take pictures of your places."
+        }
+      ]
+    ]
   }
 }
