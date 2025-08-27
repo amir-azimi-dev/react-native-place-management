@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StyleSheet, ScrollView, Text, View, TextInput, Image } from "react-native";
 import Container from "../components/Container";
 import ImagePicker from "../components/ImagePicker";
+import LocationPicker from "../components/LocationPicker";
 import { Place } from "../types";
 import COLORS from "../constants/colors";
 
@@ -49,7 +50,7 @@ const AddPlace = () => {
                     />
                 </View>
 
-                <View>
+                <View style={styles.ImagePickerContainer}>
                     <Text style={styles.inputLabel}>Image</Text>
 
                     <View style={styles.pickedImageContainer}>
@@ -67,6 +68,8 @@ const AddPlace = () => {
                         <ImagePicker onPick={pickImageHandler} />
                     </View>
                 </View>
+
+                <LocationPicker />
             </ScrollView>
         </Container>
     )
@@ -105,6 +108,10 @@ const styles = StyleSheet.create({
         minHeight: 100
     },
 
+    ImagePickerContainer: {
+        marginBottom: 16
+    },
+
     pickedImageContainer: {
         width: "100%",
         aspectRatio: 16 / 9,
@@ -125,7 +132,7 @@ const styles = StyleSheet.create({
         height: "100%",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: COLORS.primary400
+        backgroundColor: COLORS.primary100
     },
 
     pickImagePlaceHolderText: {

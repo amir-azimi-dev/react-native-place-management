@@ -25,7 +25,7 @@ const StackNavigator = createNativeStackNavigator<RootStackNavigationProps>({
     AllPlaces: {
       screen: AllPlaces,
       options: ({ navigation }) => ({
-        title: "Favorite Places",
+        title: "Your Favorite Places",
         headerRight: ({ tintColor }) => (
           <IconButton
             icon="add"

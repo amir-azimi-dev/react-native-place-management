@@ -1,4 +1,5 @@
-import { Alert, Button, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
+import Button from "./Button";
 import * as imagePicker from "expo-image-picker";
 
 
@@ -25,7 +26,7 @@ const ImagePicker = ({ takeImage, onPick }: { takeImage?: boolean, onPick?: (ima
             return permissionData.granted;
         }
 
-        const permissionData = await requestCameraPermission();
+        const permissionData = await requestMediaPermission();
 
         !permissionData.granted && Alert.alert("Permission Denied", "For picking an image, you have to grant the permission.");
         return permissionData.granted;
@@ -69,6 +70,7 @@ const ImagePicker = ({ takeImage, onPick }: { takeImage?: boolean, onPick?: (ima
         <View style={styles.container}>
             <Button
                 title={takeImage ? "Take Image" : "Pick Image"}
+                icon={takeImage ? "camera" : "image"}
                 onPress={takeImage ? takeImageHandler : pickImageHandler}
             />
         </View>
