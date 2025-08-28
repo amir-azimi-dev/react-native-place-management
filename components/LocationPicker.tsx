@@ -1,14 +1,19 @@
-import { useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import COLORS from "../constants/colors";
 import Button from "./Button";
 import * as Location from 'expo-location';
-import MapView, { Marker } from "react-native-maps";
+import LeafletMap from "./MapLeaflet";
 
 const LocationPicker = () => {
     const [status, requestPermission] = Location.useForegroundPermissions();
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [markedLocation, setMarkedLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+
+    useEffect(() => {
+        getCurrentLocationHandler();
+
+    }, []);
 
     const verifyPermission = async (): Promise<boolean> => {
         if (status?.granted) return true;
@@ -29,33 +34,36 @@ const LocationPicker = () => {
         if (!isPermissionGranted) return;
 
         const location = await Location.getCurrentPositionAsync({});
-        console.log(location);
         setLocation(location);
     };
 
-    const openStreetMapUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const markCurrentLocationHandler = (): void => {
+        if (!location?.coords) return;
+
+        setMarkedLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+    };
+
+    const markLocationHandler = (location: { latitude: number; longitude: number } | null): void => setMarkedLocation(location);
 
     return (
         <View>
             <Text style={styles.title}>Location</Text>
 
             <View style={styles.mapContainer}>
-
-                <MapView
-                    style={{ flex: 1 }}
-                    initialRegion={{
-                        latitude: 35.6892,
-                        longitude: 51.3890,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05,
-                    }}
-                >
-                    <Marker coordinate={{ latitude: 35.6892, longitude: 51.3890 }} />
-                </MapView>
+                {(location?.coords.longitude) ? (
+                    <LeafletMap
+                        userLocation={{ longitude: location.coords.longitude, latitude: location.coords.latitude }}
+                        markedLocation={markedLocation}
+                        onLocationPick={markLocationHandler}
+                        staticMap
+                    />
+                ) : (
+                    <ActivityIndicator size={30} style={styles.loader} />
+                )}
             </View>
 
             <View style={styles.locationButtonsContainer}>
-                <Button title="Locate User" icon="location" onPress={getCurrentLocationHandler} />
+                <Button title="Locate User" icon="location" onPress={markCurrentLocationHandler} />
                 <Button title="Pick on Map" icon="map" />
             </View>
         </View>
@@ -79,6 +87,10 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         borderWidth: 1,
         borderColor: COLORS.primary500
+    },
+
+    loader: {
+        flex: 1
     },
 
     locationButtonsContainer: {
