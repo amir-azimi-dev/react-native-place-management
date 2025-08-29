@@ -4,11 +4,24 @@ import COLORS from "../constants/colors";
 import Button from "./Button";
 import * as Location from 'expo-location';
 import LeafletMap from "./MapLeaflet";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { AddPlaceScreenRouteProps, MapScreenProps } from "../types/navigation";
 
 const LocationPicker = () => {
     const [status, requestPermission] = Location.useForegroundPermissions();
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [markedLocation, setMarkedLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+
+    const navigation = useNavigation<MapScreenProps>();
+    const selectedLocation = useRoute<AddPlaceScreenRouteProps>().params;
+
+    useEffect(() => {
+        if (!selectedLocation) return;
+
+        const { longitude, latitude } = selectedLocation;
+        setMarkedLocation({ longitude, latitude });
+
+    }, [selectedLocation]);
 
     useEffect(() => {
         getCurrentLocationHandler();
@@ -43,6 +56,12 @@ const LocationPicker = () => {
         setMarkedLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
     };
 
+    const navigateToMapScreenHandler = (): void => {
+        if (!location?.coords.longitude) return;
+
+        navigation.navigate("Map", { longitude: location.coords.longitude, latitude: location.coords.latitude });
+    };
+
     const markLocationHandler = (location: { latitude: number; longitude: number } | null): void => setMarkedLocation(location);
 
     return (
@@ -52,7 +71,10 @@ const LocationPicker = () => {
             <View style={styles.mapContainer}>
                 {(location?.coords.longitude) ? (
                     <LeafletMap
-                        userLocation={{ longitude: location.coords.longitude, latitude: location.coords.latitude }}
+                        userLocation={{
+                            longitude: markedLocation?.longitude || location.coords.longitude,
+                            latitude: markedLocation?.latitude || location.coords.latitude
+                        }}
                         markedLocation={markedLocation}
                         onLocationPick={markLocationHandler}
                         staticMap
@@ -64,7 +86,7 @@ const LocationPicker = () => {
 
             <View style={styles.locationButtonsContainer}>
                 <Button title="Locate User" icon="location" onPress={markCurrentLocationHandler} />
-                <Button title="Pick on Map" icon="map" />
+                <Button title="Pick on Map" icon="map" onPress={navigateToMapScreenHandler} />
             </View>
         </View>
     )

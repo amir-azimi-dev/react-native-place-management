@@ -4,7 +4,7 @@ import COLORS from "../constants/colors";
 
 type ButtonPropsTypes = {
     title: string;
-    icon?: "camera" | "image" | "location" | "map";
+    icon?: "camera" | "image" | "location" | "map" | "save";
     onPress?: () => void;
 };
 
