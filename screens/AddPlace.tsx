@@ -1,27 +1,58 @@
 import { useState } from "react";
-import { StyleSheet, ScrollView, Text, View, TextInput, Image } from "react-native";
+import { StyleSheet, ScrollView, Text, View, TextInput, Image, Alert } from "react-native";
 import Container from "../components/Container";
 import ImagePicker from "../components/ImagePicker";
 import LocationPicker from "../components/LocationPicker";
-import { Place } from "../types";
+import Button from "../components/Button";
 import COLORS from "../constants/colors";
 
 const inputInitialValue = {
     title: "",
-    address: "",
-    imageURI: "",
+    address: ""
 };
 
 const AddPlace = () => {
-    const [inputValues, setInputValues] = useState<Omit<Place, "id" | "location">>(inputInitialValue);
+    const [inputValues, setInputValues] = useState<{title: string, address: string}>(inputInitialValue);
     const [pickedImage, setPickedImage] = useState<string | undefined>();
-    const [location, setLocation] = useState<{ longitude?: number, latitude?: number }>({ longitude: undefined, latitude: undefined });
+    const [location, setLocation] = useState<{ longitude: number, latitude: number } | null>(null);
 
-    const updateInputValue = (inputKey: keyof Place, newValue: string | number) => {
+    const updateInputValue = (inputKey: "title" | "address", newValue: string | number) => {
         setInputValues(prevValues => ({ ...prevValues, [inputKey]: newValue }));
     };
 
-    const pickImageHandler = (imageUri: string) => setPickedImage(imageUri);
+    const pickImageHandler = (imageUri: string): void => setPickedImage(imageUri);
+    const pickLocationHandler = (location: { longitude: number, latitude: number } | null): void => setLocation(location);
+
+    const savePlaceHandler = (): void => {
+        const isFormValid = validateForm();
+        if (!isFormValid) return;
+
+
+    };
+
+    const validateForm = (): boolean => {
+        if (inputValues.title.trim().length < 4) {
+            Alert.alert("Invalid Form Data", "Place Title must have at least 3 characters!");
+            return false;
+        }
+
+        if (inputValues.address.trim().length < 9) {
+            Alert.alert("Invalid Form Data", "Place Address must have at least 8 characters!");
+            return false;
+        }
+
+        if (!pickedImage) {
+            Alert.alert("Invalid Form Data", "An Image must be picked!");
+            return false;
+        }
+
+        if (!location) {
+            Alert.alert("Invalid Form Data", "The Location must be picked!");
+            return false;
+        }
+
+        return true;
+    };
 
     return (
         <Container>
@@ -69,7 +100,11 @@ const AddPlace = () => {
                     </View>
                 </View>
 
-                <LocationPicker />
+                <LocationPicker markedLocation={location} onPickLocation={pickLocationHandler} />
+
+                <View style={styles.buttonContainer}>
+                    <Button title="Add Place" onPress={savePlaceHandler} />
+                </View>
             </ScrollView>
         </Container>
     )
@@ -79,7 +114,9 @@ export default AddPlace;
 
 const styles = StyleSheet.create({
     scrollView: {
-        flex: 1
+        flex: 1,
+        paddingHorizontal: 10,
+        marginHorizontal: -10
     },
 
     inputContainer: {
@@ -145,5 +182,12 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         columnGap: 6
+    },
+
+    buttonContainer: {
+        marginVertical: 20,
+        paddingTop: 20,
+        borderTopWidth: 0.5,
+        borderColor: "#ccc"
     }
 });

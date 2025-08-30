@@ -7,21 +7,25 @@ import LeafletMap from "./MapLeaflet";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AddPlaceScreenRouteProps, MapScreenProps } from "../types/navigation";
 
-const LocationPicker = () => {
+type LocationPickerPropsTypes = {
+    markedLocation: { longitude: number, latitude: number } | null;
+    onPickLocation: (location: { longitude: number, latitude: number } | null) => void;
+};
+
+const LocationPicker = ({ markedLocation, onPickLocation }: LocationPickerPropsTypes) => {
     const [status, requestPermission] = Location.useForegroundPermissions();
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
-    const [markedLocation, setMarkedLocation] = useState<{ latitude: number, longitude: number } | null>(null);
 
     const navigation = useNavigation<MapScreenProps>();
-    const selectedLocation = useRoute<AddPlaceScreenRouteProps>().params;
+    const fullScreenMapSelectedLocation = useRoute<AddPlaceScreenRouteProps>().params;
 
     useEffect(() => {
-        if (!selectedLocation) return;
+        if (!fullScreenMapSelectedLocation) return;
 
-        const { longitude, latitude } = selectedLocation;
-        setMarkedLocation({ longitude, latitude });
+        const { longitude, latitude } = fullScreenMapSelectedLocation;
+        onPickLocation({ longitude, latitude });
 
-    }, [selectedLocation]);
+    }, [fullScreenMapSelectedLocation]);
 
     useEffect(() => {
         getCurrentLocationHandler();
@@ -53,7 +57,7 @@ const LocationPicker = () => {
     const markCurrentLocationHandler = (): void => {
         if (!location?.coords) return;
 
-        setMarkedLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+        onPickLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
     };
 
     const navigateToMapScreenHandler = (): void => {
@@ -62,7 +66,7 @@ const LocationPicker = () => {
         navigation.navigate("Map", { longitude: location.coords.longitude, latitude: location.coords.latitude });
     };
 
-    const markLocationHandler = (location: { latitude: number; longitude: number } | null): void => setMarkedLocation(location);
+    const markLocationHandler = (location: { latitude: number; longitude: number } | null): void => onPickLocation(location);
 
     return (
         <View>

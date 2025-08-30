@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         borderRadius: 6,
-        overflow: "hidden"
+        overflow: "hidden",
+        boxShadow: "2px 2px 5px #205c9c33"
     },
 
     pressable: {
