@@ -12,6 +12,8 @@ const PlacesList = ({ places }: { places: Place[] }) => {
                     data={places}
                     renderItem={({ item }) => <PlaceItem {...item} />}
                     keyExtractor={item => item.id}
+                    contentContainerStyle={styles.flatListContentContainer}
+                    style={styles.flatList}
                 />
             ) : (
                 <Text style={styles.fallback}>No Places Yet!</Text>
@@ -23,6 +25,15 @@ const PlacesList = ({ places }: { places: Place[] }) => {
 export default PlacesList;
 
 const styles = StyleSheet.create({
+    flatList: {
+        paddingHorizontal: 10,
+        marginHorizontal: -10
+    },
+
+    flatListContentContainer: {
+        rowGap: 8
+    },
+
     fallback: {
         marginHorizontal: "auto",
         marginVertical: "auto",

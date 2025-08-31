@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 6,
         overflow: "hidden",
-        boxShadow: "2px 2px 5px #205c9c33"
+        boxShadow: "2px 0 8px #00000041"
     },
 
     pressable: {
