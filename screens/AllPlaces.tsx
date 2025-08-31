@@ -1,16 +1,29 @@
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
 import PlacesList from "../components/PlacesList";
-import Place from "../models/Place";
-
-const dummyPlaces = [
-    new Place("place 1", "image-1", "address 1", { longitude: 1.222, latitude: 223.22 }),
-    new Place("place 2", "image-2", "address 2", { longitude: 1.222, latitude: 223.22 }),
-    new Place("place 3", "image-3", "address 3", { longitude: 1.222, latitude: 223.22 }),
-    new Place("place 4", "image-4", "address 4", { longitude: 1.222, latitude: 223.22 }),
-];
+import { Place } from "../types";
 
 const AllPlaces = () => {
-    return <PlacesList places={dummyPlaces} />
+    const [placesData, setPlacesData] = useState<Place[]>([]);
+
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (!isFocused) return;
+
+        (async () => {
+            const stringifiedPlacesData = await AsyncStorage.getItem("places");
+            const placesData = stringifiedPlacesData ? JSON.parse(stringifiedPlacesData) : [];
+
+            setPlacesData(placesData);
+
+        })();
+
+    }, [isFocused]);
+
+    return <PlacesList places={placesData} />
 };
 
 export default AllPlaces;
