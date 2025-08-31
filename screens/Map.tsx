@@ -19,6 +19,7 @@ const Map = () => {
     const confirmLocationHandler = () => {
         if (!markedLocation) return Alert.alert("No Locations Picked!", "Please Select A Location (by tapping on the map) First!");
 
+        navigation.pop(1);
         navigation.replace("AddPlace", { longitude: markedLocation.longitude, latitude: markedLocation.latitude });
     };
 

@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { StyleSheet, ScrollView, Text, View, TextInput, Image, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { AddPlaceScreenProps } from "../types/navigation";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Container from "../components/Container";
 import ImagePicker from "../components/ImagePicker";
 import LocationPicker from "../components/LocationPicker";
 import Button from "../components/Button";
 import COLORS from "../constants/colors";
+import Place from "../models/Place";
+import { Place as PlaceInterface } from "../types";
 
 const inputInitialValue = {
     title: "",
@@ -12,9 +17,11 @@ const inputInitialValue = {
 };
 
 const AddPlace = () => {
-    const [inputValues, setInputValues] = useState<{title: string, address: string}>(inputInitialValue);
+    const [inputValues, setInputValues] = useState<{ title: string, address: string }>(inputInitialValue);
     const [pickedImage, setPickedImage] = useState<string | undefined>();
     const [location, setLocation] = useState<{ longitude: number, latitude: number } | null>(null);
+
+    const navigation = useNavigation<AddPlaceScreenProps>();
 
     const updateInputValue = (inputKey: "title" | "address", newValue: string | number) => {
         setInputValues(prevValues => ({ ...prevValues, [inputKey]: newValue }));
@@ -23,11 +30,24 @@ const AddPlace = () => {
     const pickImageHandler = (imageUri: string): void => setPickedImage(imageUri);
     const pickLocationHandler = (location: { longitude: number, latitude: number } | null): void => setLocation(location);
 
-    const savePlaceHandler = (): void => {
+    const createPlaceHandler = async (): Promise<void> => {
         const isFormValid = validateForm();
         if (!isFormValid) return;
 
+        const placeData = new Place(
+            inputValues.title,
+            inputValues.address,
+            pickedImage!,
+            { latitude: location!.latitude, longitude: location!.longitude }
+        );
 
+        const stringifiedPrevPlacesData = await AsyncStorage.getItem("places");
+        const prevPlacesData: PlaceInterface[] = stringifiedPrevPlacesData ? JSON.parse(stringifiedPrevPlacesData) : [];
+        const newPlacesData = [...prevPlacesData, placeData];
+        await AsyncStorage.setItem("places", JSON.stringify(newPlacesData));
+
+        navigation.popToTop();
+        navigation.replace("AllPlaces");
     };
 
     const validateForm = (): boolean => {
@@ -103,7 +123,7 @@ const AddPlace = () => {
                 <LocationPicker markedLocation={location} onPickLocation={pickLocationHandler} />
 
                 <View style={styles.buttonContainer}>
-                    <Button title="Add Place" onPress={savePlaceHandler} />
+                    <Button title="Add Place" onPress={createPlaceHandler} />
                 </View>
             </ScrollView>
         </Container>

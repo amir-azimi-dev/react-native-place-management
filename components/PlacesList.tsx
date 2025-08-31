@@ -7,7 +7,7 @@ import COLORS from "../constants/colors";
 const PlacesList = ({ places }: { places: Place[] }) => {
     return (
         <Container>
-            {!places.length ? (
+            {places.length ? (
                 <FlatList
                     data={places}
                     renderItem={({ item }) => <PlaceItem {...item} />}

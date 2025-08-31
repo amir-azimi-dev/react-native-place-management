@@ -5,8 +5,8 @@ class Place implements PlaceInterface {
 
     constructor(
         public title: string,
-        public imageURI: string,
         public address: string,
+        public imageURI: string,
         public location: { longitude: number, latitude: number }
     ) {
         this.id = String(Date.now() + "-" + Math.random() * 1000_000);

@@ -1,8 +1,8 @@
 interface Place {
     id: string;
     title: string;
-    imageURI: string;
     address: string;
+    imageURI: string;
     location: {
         longitude: number;
         latitude: number;
