@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { MapScreenProps, MapScreenRouteProps } from "../types/navigation";
 import LeafletMap from "../components/MapLeaflet";
-import { useState } from "react";
 import Container from "../components/Container";
 import COLORS from "../constants/colors";
 import Button from "../components/Button";
@@ -10,12 +10,20 @@ import Button from "../components/Button";
 const Map = () => {
     const [markedLocation, setMarkedLocation] = useState<{ latitude: number, longitude: number } | null>(null);
 
-    const initialLocation = useRoute<MapScreenRouteProps>().params;
+    const initialLocationData = useRoute<MapScreenRouteProps>().params;
     const navigation = useNavigation<MapScreenProps>();
 
     const markLocationHandler = (location: { latitude: number; longitude: number } | null): void => setMarkedLocation(location);
 
-    const markCurrentLocationHandler = () => markLocationHandler(initialLocation);
+    useEffect(() => {
+        initialLocationData.isStatic && setMarkedLocation({
+            longitude: initialLocationData.longitude,
+            latitude: initialLocationData.latitude
+        });
+
+    }, [initialLocationData.isStatic]);
+
+    const markCurrentLocationHandler = () => markLocationHandler(initialLocationData);
     const confirmLocationHandler = () => {
         if (!markedLocation) return Alert.alert("No Locations Picked!", "Please Select A Location (by tapping on the map) First!");
 
@@ -26,24 +34,27 @@ const Map = () => {
     return (
         <Container>
             <View style={styles.mapContainer}>
-                {(initialLocation?.longitude) ? (
+                {(initialLocationData?.longitude) ? (
                     <LeafletMap
                         userLocation={{
-                            longitude: markedLocation?.longitude || initialLocation.longitude,
-                            latitude: markedLocation?.latitude || initialLocation.latitude
+                            longitude: markedLocation?.longitude || initialLocationData.longitude,
+                            latitude: markedLocation?.latitude || initialLocationData.latitude
                         }}
                         markedLocation={markedLocation}
                         onLocationPick={markLocationHandler}
+                        staticMap={!!initialLocationData.isStatic}
                     />
                 ) : (
                     <ActivityIndicator size={30} style={styles.loader} />
                 )}
             </View>
 
-            <View style={styles.buttonsContainer}>
-                <Button title="Locate User" icon="location" onPress={markCurrentLocationHandler} />
-                <Button title="Confirm Location" icon="save" onPress={confirmLocationHandler} />
-            </View>
+            {!initialLocationData.isStatic && (
+                <View style={styles.buttonsContainer}>
+                    <Button title="Locate User" icon="location" onPress={markCurrentLocationHandler} />
+                    <Button title="Confirm Location" icon="save" onPress={confirmLocationHandler} />
+                </View>
+            )}
         </Container>
     )
 };

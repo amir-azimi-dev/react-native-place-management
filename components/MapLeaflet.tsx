@@ -1,21 +1,21 @@
 import { WebView } from "react-native-webview";
 
 type LeafletMapProps = {
-    userLocation: { latitude: number; longitude: number } | null;
-    markedLocation: { latitude: number; longitude: number } | null;
-    onLocationPick: (location: { latitude: number; longitude: number }) => void;
-    staticMap?: boolean;
+  userLocation: { latitude: number; longitude: number } | null;
+  markedLocation: { latitude: number; longitude: number } | null;
+  onLocationPick: (location: { latitude: number; longitude: number }) => void;
+  staticMap?: boolean;
 }
 
 const LeafletMap: React.FC<LeafletMapProps> = ({ userLocation, markedLocation, onLocationPick, staticMap }) => {
 
-    const generateMapHTML = () => {
-        const lng = userLocation?.longitude ?? 35.6892;
-        const lat = userLocation?.latitude ?? 51.3890;
-        const markerLat = markedLocation?.latitude ?? null;
-        const markerLng = markedLocation?.longitude ?? null;
+  const generateMapHTML = () => {
+    const lng = userLocation?.longitude ?? 35.6892;
+    const lat = userLocation?.latitude ?? 51.3890;
+    const markerLat = markedLocation?.latitude ?? null;
+    const markerLng = markedLocation?.longitude ?? null;
 
-        return `
+    return `
                 <!DOCTYPE html>
                 <html>
                     <head>
@@ -48,6 +48,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ userLocation, markedLocation, o
                           marker = L.marker([lat, lng]).addTo(map).bindPopup("Picked Location").openPopup();
 
                           marker.on('click', function() {
+                            if (${staticMap}) return;
                             map.removeLayer(marker);
                             marker = null;
                             window.ReactNativeWebView.postMessage(JSON.stringify(null));
@@ -70,22 +71,22 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ userLocation, markedLocation, o
                     </body>
                 </html>
     `;
-    };
+  };
 
-    const handleWebViewMessage = (event: any) => {
-        const data = JSON.parse(event.nativeEvent.data);
-        onLocationPick(data);
-    };
+  const handleWebViewMessage = (event: any) => {
+    const data = JSON.parse(event.nativeEvent.data);
+    onLocationPick(data);
+  };
 
-    return (
-        <WebView
-            originWhitelist={["*"]}
-            source={{ html: generateMapHTML() }}
-            onMessage={handleWebViewMessage}
-            javaScriptEnabled
-            style={{ flex: 1 }}
-        />
-    );
+  return (
+    <WebView
+      originWhitelist={["*"]}
+      source={{ html: generateMapHTML() }}
+      onMessage={handleWebViewMessage}
+      javaScriptEnabled
+      style={{ flex: 1 }}
+    />
+  );
 };
 
 export default LeafletMap;

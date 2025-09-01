@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 type RootStackNavigationProps = {
     AllPlaces: undefined;
     AddPlace: { longitude: number, latitude: number } | undefined;
-    Map: { longitude: number, latitude: number };
+    Map: { longitude: number, latitude: number, isStatic?: boolean };
     PlaceDetails: { id: string };
 };
 
@@ -16,6 +16,7 @@ type PlaceDetailsScreenProps = NativeStackNavigationProp<RootStackNavigationProp
 
 type AddPlaceScreenRouteProps = RouteProp<RootStackNavigationProps, "AddPlace">;
 type MapScreenRouteProps = RouteProp<RootStackNavigationProps, "Map">;
+type PlaceDetailsScreenRouteProps = RouteProp<RootStackNavigationProps, "PlaceDetails">;
 
 
 export {
@@ -25,5 +26,6 @@ export {
     AddPlaceScreenProps,
     PlaceDetailsScreenProps,
     AddPlaceScreenRouteProps,
-    MapScreenRouteProps
+    MapScreenRouteProps,
+    PlaceDetailsScreenRouteProps
 };
